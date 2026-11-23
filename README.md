@@ -4,7 +4,7 @@ A two-player card game in the browser. Sit down with a friend, or with a bot tha
 
 The recording is a bot-versus-bot game. Both seats are generation 7.
 
-[Watch the recording](<Project media/Video_preview.mp4>)
+https://github.com/user-attachments/assets/d2e63438-85f6-4a4b-9a3b-978a822956bd
 
 ## The table
 
