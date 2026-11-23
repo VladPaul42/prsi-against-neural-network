@@ -1,0 +1,30 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+personal_notes.txt
+
+games/
+
+# The table plays runs/league/gen_007/weights.npz. The rest of the run stays local.
+runs/league/checkpoints/
+runs/league/matches/
+runs/league/logs/
+runs/league/gen_001/
+runs/league/gen_002/
+runs/league/gen_003/
+runs/league/gen_004/
+runs/league/gen_005/
+runs/league/gen_006/
+runs/league/gen_007/model.pt
+
+design elements/*
+!design elements/table-texture.png
+training_initiation/
+training_visualizations/
+fog_of_war_estimation/
+
+Thumbs.db
+Desktop.ini
+.DS_Store

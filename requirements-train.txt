@@ -1,0 +1,9 @@
+# Extra packages for training the bot, running tournaments and the notebooks.
+# Install on top of requirements.txt:  pip install -r requirements-train.txt
+# On Windows the regular torch wheel from PyPI is the CPU-only build.
+torch>=2.6
+numpy>=2.1
+pandas>=2.2
+matplotlib>=3.9
+jupyter>=1.1
+ipykernel>=6.29

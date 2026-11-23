@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prší</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect fill='%231a120c' width='64' height='64'/%3E%3Crect fill='%23e7dccb' x='18' y='10' width='28' height='44'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="join" class="join">
+    <form id="join-form" class="panel">
+      <h1>Prší</h1>
+      <p class="lede">Enter the room code from the person who started the game.</p>
+      <label>
+        Your name
+        <input id="name" name="name" maxlength="20" autocomplete="nickname" placeholder="Andy" required>
+      </label>
+      <label>
+        Room code
+        <input id="code" name="code" maxlength="12" autocapitalize="characters" autocomplete="off" placeholder="ABC123" required>
+      </label>
+      <p id="join-error" class="form-error" role="alert"></p>
+      <button type="submit" class="primary" id="join-button">Join game</button>
+      <button type="button" class="text-button" id="join-help">How to play</button>
+    </form>
+  </section>
+
+  <section id="table" class="table play hidden">
+    <header class="play-toolbar">
+      <div class="toolbar-row toolbar-main">
+        <div class="toolbar-side">
+          <h1>Prší</h1>
+          <p class="play-room"><span>Room</span> <b id="room-label" class="room-label"></b></p>
+          <p id="score" class="score"></p>
+        </div>
+        <p id="turn-line" class="turn-line" role="status"></p>
+        <div class="toolbar-side toolbar-actions">
+          <span id="link-status" class="link-status">Connecting…</span>
+          <button type="button" class="text-button hidden" id="resign-button">Resign</button>
+          <button type="button" class="text-button" id="help-button">How to play</button>
+          <a id="review-link" class="text-button hidden" target="_blank" rel="noopener">Review saved games</a>
+        </div>
+      </div>
+      <div id="host-bar" class="toolbar-row hidden">
+        <div id="mode-buttons" class="mode-buttons"></div>
+        <button type="button" class="text-button hidden" id="reset-score">Reset score</button>
+        <p id="bot-note" class="hint"></p>
+      </div>
+    </header>
+
+    <div id="play-stage" class="play-stage">
+      <aside class="rail rail-left rail-moves" aria-label="Recent moves">
+        <button type="button" class="fold" aria-expanded="true" aria-label="Collapse recent moves" data-open-label="Collapse recent moves" data-shut-label="Show recent moves"><i></i></button>
+        <h2>Recent moves</h2>
+        <ol id="log"></ol>
+      </aside>
+
+      <div class="play-center">
+        <div id="waiting" class="waiting hidden">
+          <p id="waiting-text">Waiting for your friend to join.</p>
+          <div id="waiting-invite">
+            <p class="big-code" id="waiting-code"></p>
+            <button type="button" class="primary" id="copy-code">Copy room code</button>
+            <p class="hint">Send them the ngrok link and this code. The game starts when they join.</p>
+          </div>
+        </div>
+
+        <div id="board" class="board hidden">
+          <div class="play-row">
+            <div class="play-main">
+              <section class="opponent" aria-label="Opponent">
+                <div class="who">
+                  <h2 id="opp-name">Opponent</h2>
+                  <p id="opp-meta"></p>
+                </div>
+                <div id="opp-cards" class="backs"></div>
+              </section>
+
+              <section class="middle" aria-label="Table">
+                <div class="pile">
+                  <div id="draw-pile" class="card back draw-pile" aria-hidden="true">
+                    <img src="/cards/back.png" alt="" draggable="false">
+                  </div>
+                  <p><span id="draw-count">0</span> in the draw pile</p>
+                </div>
+                <div class="pile discard-pile">
+                  <div id="discard-stack" class="discard-stack">
+                    <div id="discard-under" class="discard-under"></div>
+                    <div id="discard" class="card" aria-label="Top of the discard pile"></div>
+                  </div>
+                </div>
+              </section>
+
+              <div class="turn-zone">
+                <div class="turn-glow" aria-hidden="true"></div>
+                <div class="turn-slot">
+                  <button type="button" class="quiet hidden" id="pass-button"></button>
+                </div>
+
+                <section class="you" aria-label="Your hand">
+                  <div class="who">
+                    <h2 id="you-name">You</h2>
+                    <p id="you-meta"></p>
+                  </div>
+                  <div id="hand" class="hand"></div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="rail rail-right rail-side" aria-label="Computer">
+        <button type="button" class="fold" aria-expanded="true" aria-label="Collapse computer" data-open-label="Collapse computer" data-shut-label="Show computer"><i></i></button>
+        <div class="rail-body">
+          <section id="panels-fold" class="panels-fold hidden">
+            <label class="lines-setting">Top lines
+              <input type="number" id="top-lines" min="1" value="3" aria-label="How many top computer lines to show">
+            </label>
+            <section id="panels" class="panels" aria-label="Bot evaluation"></section>
+          </section>
+          <button type="button" class="primary confirm-move hidden" id="confirm-move">Confirm move</button>
+        </div>
+        <div id="live-eval" class="live-eval hidden">
+          <p class="live-eval-name" id="live-eval-name-1"></p>
+          <div class="live-eval-bar empty" id="live-eval-bar" role="img" aria-label="Win chance not scored yet">
+            <div class="live-eval-top" id="live-eval-top"></div>
+            <div class="live-eval-bottom" id="live-eval-bottom"></div>
+          </div>
+          <p class="live-eval-name" id="live-eval-name-0"></p>
+          <p class="live-eval-pct is-empty" id="live-eval-pct">–</p>
+          <p class="live-eval-count" id="live-eval-count"></p>
+        </div>
+      </aside>
+      <div id="result" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="result-title">
+        <div class="dialog">
+          <h2 id="result-title"></h2>
+          <p id="result-detail"></p>
+          <p id="result-score" class="score"></p>
+          <button type="button" class="primary" id="rematch">Rematch</button>
+          <p id="rematch-note" class="hint"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="picker" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+    <div class="dialog">
+      <h2 id="picker-title">Name a suit</h2>
+      <p id="picker-card"></p>
+      <div id="picker-suits" class="suit-grid"></div>
+      <button type="button" class="text-button" id="picker-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <div id="help" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="dialog help-dialog">
+      <h2 id="help-title">How to play</h2>
+      <ul>
+        <li>Play one card that matches the suit in play, or the rank of the top card.</li>
+        <li>An Over can be played on almost anything. You then name the suit that is in play. It cannot answer a live 7 or Ace.</li>
+        <li>A 7 makes the next player take 2 cards for every 7 in a row, or play another 7.</li>
+        <li>An Ace makes the next player stand (skip the turn), or play another Ace.</li>
+        <li>You never have to play. You may draw, take the penalty, or stand instead.</li>
+        <li>Playing your last card wins, even if it is a 7 or an Ace.</li>
+        <li>When the draw pile runs out, the discard is shuffled back in, except its top card.</li>
+      </ul>
+      <button type="button" class="primary" id="help-close">Close</button>
+    </div>
+  </div>
+
+  <p id="toast" class="toast hidden" role="status"></p>
+  <script src="cards.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

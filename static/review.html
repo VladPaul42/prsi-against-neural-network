@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prší · Review</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect fill='%231a120c' width='64' height='64'/%3E%3Crect fill='%23e7dccb' x='18' y='10' width='28' height='44'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="review.css">
+</head>
+<body>
+  <section class="table review">
+    <header class="topbar review-top">
+      <div>
+        <h1>Prší · Review</h1>
+        <p id="bot-line" class="room-label"></p>
+      </div>
+    </header>
+    <p id="page-error" class="banner hidden" role="alert"></p>
+
+    <div class="review-layout">
+      <aside class="rail rail-left game-list-wrap" aria-label="Saved games">
+        <button type="button" class="fold swap" data-swap="1" aria-label="Show recent moves">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.5 8.2A8.2 8.2 0 0 0 6.4 6.1L4.2 8.2"/>
+              <path d="M4.2 4.4v3.8h3.8"/>
+              <path d="M3.5 15.8A8.2 8.2 0 0 0 17.6 17.9l2.2-2.1"/>
+              <path d="M19.8 19.6v-3.8h-3.8"/>
+            </g>
+          </svg>
+        </button>
+        <h2 id="rail-title">Saved games</h2>
+        <ol id="game-list" class="game-list"></ol>
+        <ol id="review-log" class="move-log"></ol>
+      </aside>
+
+      <main id="game" class="game-view hidden">
+        <section class="review-board">
+            <div class="seat-row">
+              <p class="seat-name" id="name-1"></p>
+              <div class="hand-row" id="hand-1"></div>
+            </div>
+            <div class="middle-row">
+              <div class="pile">
+                <div class="card back draw-pile" aria-hidden="true">
+                  <img src="/cards/back.png" alt="" draggable="false">
+                </div>
+                <p><span id="draw-count">0</span> in the draw pile</p>
+              </div>
+              <div class="pile discard-pile">
+                <div class="discard-stack">
+                  <div id="discard-under" class="discard-under"></div>
+                  <div id="top-card" class="card" aria-label="Top of the discard pile"></div>
+                </div>
+              </div>
+              <p id="state-line" class="banner hidden"></p>
+            </div>
+            <div class="seat-row">
+              <p class="seat-name" id="name-0"></p>
+              <div class="hand-row" id="hand-0"></div>
+            </div>
+          </section>
+
+        <div class="stepper">
+          <button type="button" class="mode-button" id="first" aria-label="First move">⏮</button>
+          <button type="button" class="mode-button" id="prev" aria-label="Previous move">◀</button>
+          <input type="range" id="slider" min="0" max="0" value="0" aria-label="Move">
+          <button type="button" class="mode-button" id="next" aria-label="Next move">▶</button>
+          <button type="button" class="mode-button" id="last" aria-label="Last move">⏭</button>
+        </div>
+        <p id="move-line" class="turn-line"></p>
+        <div id="review-charts" class="review-charts hidden">
+          <figure class="review-chart">
+            <figcaption>
+              Win chance
+              <span class="hint">Solid lines = that player's win estimate from own perspective.<br>Dashed lines = same as above, but both hands known.</span>
+            </figcaption>
+            <svg id="chart-chance" viewBox="0 0 640 180" role="img" aria-label="Win chance over the game" preserveAspectRatio="xMidYMid meet"></svg>
+            <ul class="chart-legend">
+              <li class="swatch-p1" id="chance-key-p1"><i></i><span id="legend-p1"></span></li>
+              <li class="swatch-p2" id="chance-key-p2"><i></i><span id="legend-p2"></span></li>
+              <li class="swatch-p1 swatch-known" id="chance-key-eval-p1"><i></i><span id="legend-eval-p1"></span></li>
+              <li class="swatch-p2 swatch-known" id="chance-key-eval-p2"><i></i><span id="legend-eval-p2"></span></li>
+            </ul>
+          </figure>
+          <figure class="review-chart" id="spread-chart">
+            <figcaption>
+              Spread against the evaluation
+              <span class="hint">Line above zero = that player overestimates their chances.<br>Line below zero = that player underestimates their chances.</span>
+            </figcaption>
+            <svg id="chart-spread" viewBox="0 0 640 180" role="img" aria-label="Spread between each player's chance and the evaluation" preserveAspectRatio="xMidYMid meet"></svg>
+            <ul class="chart-legend">
+              <li class="swatch-p1" id="spread-key-p1"><i></i><span id="legend-spread-p1"></span></li>
+              <li class="swatch-p2" id="spread-key-p2"><i></i><span id="legend-spread-p2"></span></li>
+            </ul>
+          </figure>
+        </div>
+      </main>
+
+      <aside id="review-side" class="rail rail-right review-side hidden" aria-label="Analysis">
+        <button type="button" class="fold" aria-expanded="true" aria-label="Collapse analysis" data-open-label="Collapse analysis" data-shut-label="Show analysis"><i></i></button>
+        <div class="rail-body">
+          <div>
+            <h2 id="game-title"></h2>
+            <p id="game-sub" class="hint"></p>
+          </div>
+          <div class="analysis-actions">
+            <button type="button" class="primary" id="analyse">Analyze</button>
+            <div id="progress" class="progress hidden"><div id="progress-fill"></div></div>
+            <p id="analysis-note" class="hint"></p>
+          </div>
+          <label class="lines-setting">Top lines
+            <input type="number" id="review-lines" min="1" value="3" aria-label="How many top computer lines to show">
+          </label>
+          <section id="move-analysis" class="panel-box hidden"></section>
+        </div>
+        <div id="review-eval" class="review-eval hidden">
+          <p class="eval-name" id="eval-name-1"></p>
+          <div class="eval-bar empty" id="eval-bar" role="img" aria-label="Win chance not scored yet">
+            <div class="eval-top" id="eval-top"></div>
+            <div class="eval-bottom" id="eval-bottom"></div>
+          </div>
+          <p class="eval-name" id="eval-name-0"></p>
+          <p class="eval-pct is-empty" id="eval-pct">–</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+  <script src="cards.js"></script>
+  <script src="review.js"></script>
+</body>
+</html>
