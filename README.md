@@ -2,7 +2,12 @@
 
 https://github.com/user-attachments/assets/9cacd9e5-1765-46ce-a85d-fadaabe50122
 
-What you are watching is two neural networks playing each other in a game of Prší. Unlike, for example, chess engines, they have to deal with incomplete information (being unable to see the opponent's hand and draw pile) — so creating one is a fascinating probability problem.
+What you are watching is two neural networks playing against each other in a game of Prší.
+
+Their approach to finding the best move has to differ fundamentally from, for example, the one chess engines use, because, first of all, out of 32 cards you only see the ones in your hand.<br>
+*This makes Prší a game with incomplete information.*<br>
+And second, moves leading to a particular position matter, since a good player finds hints about the opponent's hand without ever seeing the cards.<br>
+*This makes Prší a non-Markovian game.*
 
 But let's not get ahead of ourselves.
 
