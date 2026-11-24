@@ -6,6 +6,7 @@ What you are watching is two neural networks playing against each other in a gam
 
 Their approach to finding the best move has to differ fundamentally from, for example, the one chess engines use, because, first of all, out of 32 cards you only see the ones in your hand.<br>
 *This makes Prší a game with incomplete information.*<br>
+<br>
 And second, moves leading to a particular position matter, since a good player finds hints about the opponent's hand without ever seeing the cards.<br>
 *This makes Prší a non-Markovian game.*
 
