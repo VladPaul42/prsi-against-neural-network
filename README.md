@@ -1,24 +1,124 @@
 # Prší
 
-A two-player card game in the browser. Sit down with a friend, or with a bot that imagines the cards it cannot see and scores those deals with a neural network.
-
-The recording is a bot-versus-bot game. Both seats are generation 7.
-
 https://github.com/user-attachments/assets/9cacd9e5-1765-46ce-a85d-fadaabe50122
+
+What you are watching is two neural networks playing each other in a game of Prší. Unlike, for example, chess engines, they have to deal with incomplete information (being unable to see the opponent's hand and draw pile) — so creating one is a fascinating probability problem.
+
+But let's not get ahead of ourselves.
+
+## The game
+
+Prší is a card game popular in the Czech Republic. Its goal is to get rid of all your cards.
+
+Two players, one small deck, and a table between them. The last card out of your hand wins, even when that card is a 7 or an Ace. The other hand stays hidden, and so does the order of the draw pile. That is the game.
+
+## Rules
+
+These are the rules the table plays, and the rules the bot was taught.
+
+A 32-card German deck: 7, 8, 9, 10, Under, Over, King, Ace, in Hearts, Leaves, Acorns, and Bells. The hearts are drawn as pomegranates. The English name stays Hearts.
+
+Each player is dealt 6 cards. One card is turned up. That opening card has no effect, even if it is a 7, an Ace, or an Over. Nineteen cards remain in the draw pile.
+
+- Play a card that matches the suit in play, or the rank of the top card.
+- An Over can be played on almost anything. You then name the suit in play. It cannot answer a live 7 or Ace.
+- A 7 makes the next player take 2 cards for every 7 in a row, or play another 7.
+- An Ace makes the next player stand, or play another Ace.
+- You never have to play. You may draw, take the penalty, or stand instead. Passing is only for when nothing can be drawn and nothing can be played.
+- Playing your last card wins, even if it is a 7 or an Ace.
+- When the draw pile runs out, the discard is shuffled back in, except its top card.
 
 ## The table
 
-Playing the bot. The search stays on the host's side of the glass: this seat only sees its own cards. The Ace just played has to be stood on, or answered with another Ace.
+You play in a browser. Your cards are at the bottom. The other hand is face down across the table. Between you sit the draw pile and the discard. Recent moves stay along one side of the page. When you play an Over, the page asks you to name the suit.
+
+The person who starts the room is the host. A friend joins with a room code. The host chooses who sits down.
 
 ![Playing the bot, with an Ace to answer](<Project media/me-vs-the-bot.png>)
 
-Watching the bot play itself. The panel is the search in progress. The bar on the right is the bottom seat's win chance, filled in as imagined finishes come back.
+This is a game against the bot. An Ace has just been played, so it has to be stood on, or answered with another Ace. This seat sees its own cards. The bot's hand, and the search it is running, stay on the host's machine.
+
+There are four ways to take a seat. Two people can play, and the bot stays out. You can play the bot yourself. A friend can play the bot while you watch its hand and the lines it is trying, and confirm each of its moves before they land. Or both seats can be the bot, and you watch.
 
 ![Both bots, with the search and the win-chance bar](<Project media/bot-vs-bot.png>)
 
-A finished game, stepped back to the first move. Solid lines are each player's own estimate. Dashed lines are the same positions with both hands known. The page normally gives each legal card 10,000 imagined games. This capture used 250, so the chart would finish.
+Both hands are on the table here, and so is the search. The lines on the right are the cards being tried. The bar is the bottom seat's chance of winning, filling in as imagined games come back.
+
+When a game ends, it is written down on the machine running the server. The host can open it again, step through the moves, and ask the page to score every one of them.
 
 ![Review of a saved game, with the win-chance chart](<Project media/review.png>)
+
+This one has been stepped back to the first move. The solid lines are each player's own estimate, from the cards that player could see. The dashed lines are the same positions with both hands known. The page normally gives each legal card 10,000 imagined games. This picture used 250, so the chart would finish.
+
+## Why I did this
+
+My interest in game engines started long ago with chess. I had a basic idea of how they work. I knew what a node is, and what a tree search is, and I went on from that knowledge.
+
+A chess engine searches a tree of positions both players can see. I wanted that same search in a game where the position is only partly there. In Prší the missing cards are the opponent's hand and the order of the draw pile. A line through the tree is a line through one way those cards might be arranged. The engine had to live with that, one imagined deal at a time.
+
+## What is ISMCTS
+
+Information set Monte Carlo tree search is a tree search for a position you only partly see.
+
+What you can see is an information set: every deal that might still be the real one, given your hand, the cards on the table, and the play so far. The search samples one legal deal from that set and plays it down a tree, as a chess program would if the cards were face up. Then it samples another. A card earns its place from the deals in which it was actually tried.
+
+That is the idea. The habits of this particular search, and the network inside it, come next.
+
+## What is PPO
+
+Proximal policy optimization is how that network learned.
+
+A game ends, and the ending is the only reward: +1, −1, or 0 for a draw. The learner then takes a small step toward the moves that produced it, small enough to stay close to the player that just played those games. An entropy coefficient keeps unlikely cards in the mix. I brought that coefficient down from 0.30 to 0.00, one hundredth at a time.
+
+Who it played, and which generation kept the title, belongs with the training. The search comes first.
+
+## How the engine plays and trains
+
+The bot never sees the opponent's hand or the order of the draw pile. It sees its own hand, the public piles, and a card tracker. The tracker keeps the cards that are certainly in the opponent's hand, the cards that cannot be there, and a pool that is split in a known count between that hand and the draw pile. So there's only one state in which all the cards can be known exactly - immediately after the reshuffle.
+
+Search imagines one legal deal at a time and plays it down a tree of moves. At every decision, the card it tries next is the legal one it has visited least. A card the tree has never tried goes before a card it has already seen.
+
+The first time a position is reached, the network gives a probability to every legal card. Those numbers are stored and shown on the table, the network's opinion at the moment the search arrives. The next card tried is the one visited least. There is no random playout to the end of the deal. The value head scores the position just reached, and that score is what comes back up the tree. On the way back, the player to move is treated as playing the best card that has actually been tried.
+
+The network is a small multilayer perceptron. The input is 1,564 numbers: the hand, the public flags, where the tracker thinks each card is, and the last 30 moves. Two hidden layers of 512 units feed a policy over the 45 legal action numbers and a value in the range −1 to 1. Playing uses a NumPy copy of the weights, so the table does not need PyTorch.
+
+The rules live in `prsi`. The search uses a second, faster copy of those rules in `bot`. The tests play the same moves through both.
+
+## How it was trained
+
+I trained on CPU. The only reward is the result of the game: +1, −1, or 0 for a draw. During training the learner samples from its policy, and so does the opponent. The games that decide a champion are different. Each network plays its most likely card.
+
+Generation 1 learned against random play. Every later generation learned against random play and against all earlier generations, and never against itself. An opponent it was losing to was dealt more of the games.
+
+Each generation walks an entropy coefficient from 0.30 down to 0.00, in steps of 0.01. Generations 1–6 took 30 updates at each step. Generation 7 took 100. An update is 512 games. Generation 7 is 3,100 updates, 1,587,200 games, and 14.8 hours. The six generations before it are about 476,000 games each.
+
+Along that walk, the score I kept was the one against a reference opponent. For generation 1 the reference was random play. After that it was the generation holding the title.
+
+![Score vs reference](<Project media/score-vs-reference.png>)
+
+Generation 7 stayed at each step much longer. The opponents it was still losing to were the earlier networks, and those were the ones dealt more of its games.
+
+![Generation 7 during training](<Project media/generation-7-without-baseline.png>)
+
+After training, a generation plays 100,000 mirrored games against every earlier generation and against random play. The same deal is played twice, with the seats swapped, because the cards matter. A draw counts as half a win. The new generation becomes the best only if it scores over 50% against every earlier generation. Generation 6 did not. It reached 49.1% against generation 5, and generation 5 stayed the best. Generation 7 did: 51.4% against generation 5, and 97.0% against random play.
+
+The hundred thousand games are the verdict. The learning is the stretch before them. An update is a small change, made from 512 games. Generation 1 met the game with nothing behind it. Every generation after that met someone who could already play.
+
+![Training updates](<Project media/ppo-updates.png>)
+
+Seven generations sat down. The title moved after each of the first five. Generation 6 trained and left it where it was. Generation 7 took it.
+
+| Generation | Updates | Games | Hours | Reference | Score against reference | Previous best | Score against best | Became best | Best after |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 930 | 476,160 | 8.80 | random play | 97.3% | | | Yes | 1 |
+| 2 | 930 | 476,160 | 3.95 | generation 1 | 56.4% | 1 | 55.1% | Yes | 2 |
+| 3 | 930 | 476,160 | 3.67 | generation 2 | 51.4% | 2 | 50.5% | Yes | 3 |
+| 4 | 930 | 476,160 | 3.88 | generation 3 | 52.2% | 3 | 50.4% | Yes | 4 |
+| 5 | 930 | 476,160 | 4.25 | generation 4 | 53.4% | 4 | 51.1% | Yes | 5 |
+| 6 | 930 | 476,160 | 4.05 | generation 5 | 48.5% | 5 | 49.1% | No | 5 |
+| 7 | 3,100 | 1,587,200 | 14.79 | generation 5 | 50.9% | 5 | 51.4% | Yes | 7 |
+
+The weights the table loads are generation 7, in `runs/league/gen_007/weights.npz`. The settings of that run are in `runs/league/config.json`. Retraining needs `pip install -r requirements-train.txt` and then `bot.league.run_league`.
 
 ## How to run
 
@@ -62,57 +162,6 @@ Saved games are written to `games/` on the machine running the server. The host 
 ```
 
 The league tests need the training packages as well: `pip install -r requirements-train.txt`.
-
-## Rules
-
-A 32-card German deck: 7, 8, 9, 10, Under, Over, King, Ace, in Hearts, Leaves, Acorns, and Bells. The hearts are drawn as pomegranates. The English name stays Hearts.
-
-Each player is dealt 6 cards. One card is turned up. That opening card has no effect, even if it is a 7, an Ace, or an Over. Nineteen cards remain in the draw pile.
-
-- Play a card that matches the suit in play, or the rank of the top card.
-- An Over can be played on almost anything. You then name the suit in play. It cannot answer a live 7 or Ace.
-- A 7 makes the next player take 2 cards for every 7 in a row, or play another 7.
-- An Ace makes the next player stand, or play another Ace.
-- You never have to play. You may draw, take the penalty, or stand instead. Passing is only for when nothing can be drawn and nothing can be played.
-- Playing your last card wins, even if it is a 7 or an Ace.
-- When the draw pile runs out, the discard is shuffled back in, except its top card.
-
-## How the bot plays
-
-The bot never sees the opponent's hand or the order of the draw pile. It sees its own hand, the public piles, and a card tracker. The tracker keeps the cards that are certainly in the opponent's hand, the cards that cannot be there, and a pool that is split in a known count between that hand and the draw pile. A reshuffle makes this sharp: an empty draw pile means every unseen card is in the opponent's hand, and the new draw pile is the old discard minus its top card, in an unknown order.
-
-Search imagines one legal deal at a time and plays it down a tree of moves. At every decision, among the cards legal in that deal, the one tried least often goes next. A card the tree has never seen is tried before a repeat. On the way back, the player to move is treated as playing the best card that has actually been tried.
-
-The network does two jobs inside that search, and neither one is "pick the top move."
-
-- The first time a position is reached, the network gives a probability to every legal card. Those numbers are stored and shown. They do not choose which card is tried next.
-- There is no random rollout. The new position is scored by the value head.
-
-Without a trained network the same search finishes deals by playing at random. Generation 7 is the network the table loads.
-
-The network itself is a small multilayer perceptron. The input is 1,564 numbers: the hand, the public flags, where the tracker thinks each card is, and the last 30 moves. Two hidden layers of 512 units feed a policy over the 45 legal action numbers and a value in the range −1 to 1. Playing uses a NumPy copy of the weights, so the table does not need PyTorch.
-
-The rules live in `prsi`. The search uses a second, faster copy of those rules in `bot`. The tests play the same moves through both.
-
-## How it was trained
-
-Proximal policy optimization, on CPU. The only reward is the result of the game: +1, −1, or 0 for a draw. During training the learner samples from its policy, and so does the opponent. The evaluation games are different: each network plays its most likely card.
-
-Generation 1 learned against random play. Every later generation learned against random play and against all earlier generations, and never against itself. An opponent it was losing to was dealt more of the games.
-
-Each generation walks an entropy coefficient from 0.30 down to 0.00, in steps of 0.01. Generations 1–6 took 30 updates at each step. Generation 7 took 100. An update is 512 games. Generation 7 is 3,100 updates, 1,587,200 games, and 14.8 hours. The six generations before it are about 476,000 games each.
-
-After training, a generation plays 100,000 mirrored games against every earlier generation and against random play. The same deal is played twice, with the seats swapped, because the cards matter. A draw counts as half a win. The new generation becomes the best only if it scores over 50% against every earlier generation. Generation 6 did not. Generation 7 did: 51.4% against generation 5, the previous best, and 97.0% against random play.
-
-![Win rate of each generation against earlier generations and against random play](<Project media/evaluation-by-generation.png>)
-
-*Each bar is 100,000 mirrored games. The dashed line is an even score. Random play is the tall bar in every group.*
-
-The chart below is generation 7 while it was still learning, so the learner was sampling moves rather than playing its favorite. Those scores sit lower than the final evaluation. The middle panel is how often each opponent was picked. Random play, the baseline, drops out of the mix once the earlier networks are the ones it loses to.
-
-![Generation 7's training scores, opponent mix, and games per update](<Project media/generation-7-opponents.png>)
-
-The weights are `runs/league/gen_007/weights.npz`. The settings of that run are in `runs/league/config.json`. Retraining needs `pip install -r requirements-train.txt` and then `bot.league.run_league`.
 
 ## Layout
 
