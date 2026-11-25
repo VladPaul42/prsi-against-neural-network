@@ -44,7 +44,7 @@ There are four ways to take a seat. Two people can play, and the bot stays out. 
 
 ![Both bots, with the search and the win-chance bar](<Project media/bot-vs-bot.jpg>)
 
-Both hands are on the table here, and so is the search. Bot A, at the bottom, has seven cards to Bot B's three, and the best card it has tried is the Hearts 8, at 38% for itself. Bot B drew last turn and gave itself 45% from the cards it could see, which is 55% for the seat below. The bar has both hands and a thousand finished play-outs, and it puts the bottom seat at 61%.
+Both hands are on the table here, and so is the search. Bot A has the Hearts 7 and the Hearts 8 in hand, and the Acorns Over is still among them. Bot B drew on the Acorns 8, so there is a good chance it holds no 8. Playing the Hearts 8 changes the suit to Hearts, which is better than spending the Acorns Over to name that suit.
 
 When a game ends, it is written down on the machine running the server. The host can open it again, step through the moves, and ask the page to analyze every one of them.
 
