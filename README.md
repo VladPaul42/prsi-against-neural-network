@@ -36,21 +36,25 @@ You play in a browser. Your cards are at the bottom. The other hand is face down
 
 The person who starts the room is the host. A friend joins with a room code. The host chooses who sits down.
 
-![Playing the bot, with an Ace to answer](<Project media/me-vs-the-bot.png>)
+![Playing the bot, after it stood](<Project media/me-vs-the-bot.jpg>)
 
-This is a game against the bot. An Ace has just been played, so it has to be stood on, or answered with another Ace. This seat sees its own cards. The bot's hand, and the search it is running, stay on the host's machine.
+This is a game against the bot. The Ace of Bells has been stood, and it is this seat's turn, with three cards left. This seat sees its own cards. The bot's hand stays on the host's machine.
 
 There are four ways to take a seat. Two people can play, and the bot stays out. You can play the bot yourself. A friend can play the bot while you watch its hand and the lines it is trying, and confirm each of its moves before they land. Or both seats can be the bot, and you watch.
 
-![Both bots, with the search and the win-chance bar](<Project media/bot-vs-bot.png>)
+![Both bots, with the search and the win-chance bar](<Project media/bot-vs-bot.jpg>)
 
-Both hands are on the table here, and so is the search. The lines on the right are the cards being tried. The bar is the bottom seat's chance of winning, filling in as imagined games come back.
+Both hands are on the table here, and so is the search. Bot A, at the bottom, has seven cards to Bot B's three, and the best card it has tried is the Hearts 8, at 38% for itself. Bot B drew last turn and gave itself 45% from the cards it could see, which is 55% for the seat below. The bar has both hands and a thousand finished play-outs, and it puts the bottom seat at 61%.
 
 When a game ends, it is written down on the machine running the server. The host can open it again, step through the moves, and ask the page to analyze every one of them.
 
-![Review of a saved game, with the win-chance chart](<Project media/review.png>)
+![Review of the same game, at the Hearts 8](<Project media/review.jpg>)
 
-This one has been stepped back to the first move. The solid lines are each player's own estimate, from the cards that player could see. The dashed lines are the same positions with both hands known.
+This is that game, opened again and stepped to the same decision. The lines are Bot A's own view, each tried 10,000 times: the Hearts 8, which was played, at 41%. The bar beside them is the same position with both hands known, at 58%.
+
+![Win-chance chart for that game](<Project media/review-chart.jpg>)
+
+The same review, further down the page, at move 13 of 24. The solid lines are each player's own estimate, from the cards that player could see. The dashed lines are the same positions with both hands known. The lower chart is how far those estimates sat from that. Below zero, that player was short of the chances the cards held.
 
 ## Why I did this
 
@@ -93,8 +97,6 @@ Generation 1 learned against random play. Every later generation learned against
 Each generation walks an entropy coefficient from 0.30 down to 0.00, in steps of 0.01. Generations 1–6 took 30 updates at each step. Generation 7 took 100. An update is 512 games. Generation 7 is 3,100 updates, 1,587,200 games, and 14.8 hours. The six generations before it are about 476,000 games each.
 
 Along that walk, the score I kept was the one against a reference opponent. For generation 1 the reference was random play. After that it was the generation holding the title.
-
-![Score vs reference](<Project media/score-vs-reference.png>)
 
 Generation 7 stayed at each step much longer. The opponents it was still losing to were the earlier networks, and those were the ones dealt more of its games.
 
