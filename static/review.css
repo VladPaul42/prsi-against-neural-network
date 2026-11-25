@@ -183,11 +183,11 @@
 
 .seat-name.to-move { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 
-.hand-row { display: flex; flex-wrap: wrap; gap: 8px; min-height: 104px; }
+.hand-row { display: flex; flex-wrap: wrap; gap: 0; min-height: 104px; }
 
-.hand-row .card.played { transform: translateY(-8px); }
+.hand-row .card + .card { margin-left: calc(var(--card-w) * -0.5); }
 
-.hand-row .card.played img { box-shadow: 0 0 0 1px var(--ink), 0 12px 18px rgba(0, 0, 0, 0.38); }
+.hand-row .card.played { transform: translateY(-6px); transition: none; }
 
 .middle-row { display: flex; align-items: flex-end; gap: 28px; flex-wrap: wrap; }
 
