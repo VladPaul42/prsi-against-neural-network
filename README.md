@@ -114,15 +114,15 @@ The hundred thousand games are the verdict. The learning is the stretch before t
 
 Seven generations sat down. The title moved after each of the first five. Generation 6 trained and left it where it was. Generation 7 took it.
 
-| Generation | Updates | Games | Hours | Reference | Score against reference | Previous best | Score against best | Became best | Best after |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 930 | 476,160 | 8.80 | random play | 97.3% | | | Yes | 1 |
-| 2 | 930 | 476,160 | 3.95 | generation 1 | 56.4% | 1 | 55.1% | Yes | 2 |
-| 3 | 930 | 476,160 | 3.67 | generation 2 | 51.4% | 2 | 50.5% | Yes | 3 |
-| 4 | 930 | 476,160 | 3.88 | generation 3 | 52.2% | 3 | 50.4% | Yes | 4 |
-| 5 | 930 | 476,160 | 4.25 | generation 4 | 53.4% | 4 | 51.1% | Yes | 5 |
-| 6 | 930 | 476,160 | 4.05 | generation 5 | 48.5% | 5 | 49.1% | No | 5 |
-| 7 | 3,100 | 1,587,200 | 14.79 | generation 5 | 50.9% | 5 | 51.4% | Yes | 7 |
+| Generation | Updates | Games | Hours | Previous best | Score against best | Became best | Best after |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 930 | 476,160 | 8.80 | | | Yes | 1 |
+| 2 | 930 | 476,160 | 3.95 | 1 | 55.1% | Yes | 2 |
+| 3 | 930 | 476,160 | 3.67 | 2 | 50.5% | Yes | 3 |
+| 4 | 930 | 476,160 | 3.88 | 3 | 50.4% | Yes | 4 |
+| 5 | 930 | 476,160 | 4.25 | 4 | 51.1% | Yes | 5 |
+| 6 | 930 | 476,160 | 4.05 | 5 | 49.1% | No | 5 |
+| 7 | 3,100 | 1,587,200 | 14.79 | 5 | 51.4% | Yes | 7 |
 
 The weights the table loads are generation 7, in `runs/league/gen_007/weights.npz`. The settings of that run are in `runs/league/config.json`. Retraining needs `pip install -r requirements-train.txt` and then `bot.league.run_league`.
 
