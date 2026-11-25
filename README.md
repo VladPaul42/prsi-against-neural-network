@@ -12,17 +12,11 @@ And second, moves leading to a particular position matter, since a good player f
 
 But let's not get ahead of ourselves.
 
-## The game
+## Game rules
 
 Prší is a card game popular in the Czech Republic. Its goal is to get rid of all your cards.
 
-Two players, one small deck, and a table between them. The last card out of your hand wins, even when that card is a 7 or an Ace. The other hand stays hidden, and so does the order of the draw pile. That is the game.
-
-## Rules
-
-These are the rules the table plays, and the rules the bot was taught.
-
-A 32-card German deck: 7, 8, 9, 10, Under, Over, King, Ace, in Hearts, Leaves, Acorns, and Bells. The hearts are drawn as pomegranates. The English name stays Hearts.
+Prší is played with a 32-card German deck: 7, 8, 9, 10, Under, Over, King, Ace, in Hearts, Leaves, Acorns, and Bells.*
 
 Each player is dealt 6 cards. One card is turned up. That opening card has no effect, even if it is a 7, an Ace, or an Over. Nineteen cards remain in the draw pile.
 
@@ -33,6 +27,8 @@ Each player is dealt 6 cards. One card is turned up. That opening card has no ef
 - You never have to play. You may draw, take the penalty, or stand instead. Passing is only for when nothing can be drawn and nothing can be played.
 - Playing your last card wins, even if it is a 7 or an Ace.
 - When the draw pile runs out, the discard is shuffled back in, except its top card.
+
+<em>*I replaced Hearts with Pomegranates and Bells with Bellflowers in my card designs, so that all the spot cards would be botanically themed.</em>
 
 ## The table
 
@@ -50,11 +46,11 @@ There are four ways to take a seat. Two people can play, and the bot stays out. 
 
 Both hands are on the table here, and so is the search. The lines on the right are the cards being tried. The bar is the bottom seat's chance of winning, filling in as imagined games come back.
 
-When a game ends, it is written down on the machine running the server. The host can open it again, step through the moves, and ask the page to score every one of them.
+When a game ends, it is written down on the machine running the server. The host can open it again, step through the moves, and ask the page to analyze every one of them.
 
 ![Review of a saved game, with the win-chance chart](<Project media/review.png>)
 
-This one has been stepped back to the first move. The solid lines are each player's own estimate, from the cards that player could see. The dashed lines are the same positions with both hands known. The page normally gives each legal card 10,000 imagined games. This picture used 250, so the chart would finish.
+This one has been stepped back to the first move. The solid lines are each player's own estimate, from the cards that player could see. The dashed lines are the same positions with both hands known.
 
 ## Why I did this
 
@@ -74,9 +70,7 @@ That is the idea. The habits of this particular search, and the network inside i
 
 Proximal policy optimization is how that network learned.
 
-A game ends, and the ending is the only reward: +1, −1, or 0 for a draw. The learner then takes a small step toward the moves that produced it, small enough to stay close to the player that just played those games. An entropy coefficient keeps unlikely cards in the mix. I brought that coefficient down from 0.30 to 0.00, one hundredth at a time.
-
-Who it played, and which generation kept the title, belongs with the training. The search comes first.
+A game ends, and the ending is the only reward: +1, −1, or 0 for a draw. The learner then takes a small step toward the moves that produced it, small enough to stay close to the player that just played those games. An entropy coefficient keeps unlikely cards in the mix. I brought that coefficient down from 0.30 to 0.00, one hundredth at a time. This schedule is needed so that the agent rolls down smoothly from exploration to exploitation.
 
 ## How the engine plays and trains
 
